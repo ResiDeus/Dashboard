@@ -554,7 +554,7 @@
       <!-- Stream links placeholders -->
       <div class="links-box">
         <div>// STREAM LINKS (pega tus urls aquí)</div>
-        <div>01 → <span>insert link aqui</span></div>
+        <div>01 → <span>https://radio.plaza.one/mp3</span></div>
         <div>02 → <span>insert link aqui</span></div>
         <div>03 → <span>insert link aqui</span></div>
         <div>04 → <span>insert link aqui</span></div>
@@ -577,7 +577,7 @@
       { 
         name: "SALSA_GORDA_FM", 
         track: "Héctor Lavoe • El Cantante",
-        url: "insert link aqui"   // ← pega tu stream aquí
+        url: "https://radio.plaza.one/mp3"   // ← pega tu stream aquí
       },
       { 
         name: "REGGAETON_24/7", 
@@ -744,7 +744,7 @@
       presets.forEach((p, i) => p.classList.toggle('active', i === current));
       
       // Load stream if real link exists
-      if (stations[current].url && !stations[current].url.includes('insert link')) {
+      if (stations[current].url && !stations[current].url.includes('https://radio.plaza.one/mp3')) {
         audio.src = stations[current].url;
         if (isPlaying) audio.play().catch(()=>{});
       }
