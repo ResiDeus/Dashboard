@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sistema Boricua • Radio Calle</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --neon-pink: #ff2a6d;
+      --neon-purple: #d300c5;
+      --neon-cyan: #00f0ff;
+      --neon-orange: #ff9e00;
+      --dark: #08000f;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: var(--dark);
+      color: white;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* ========== ANIMATED BACKGROUND ========== */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(to bottom, #0a0018 0%, #1a0030 40%, #2a0048 100%);
+      overflow: hidden;
+    }
+
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+        radial-gradient(1px 1px at 30% 60%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 50% 30%, #fff, transparent),
+        radial-gradient(1px 1px at 70% 80%, #fff, transparent),
+        radial-gradient(1px 1px at 90% 40%, #fff, transparent);
+      background-size: 300px 300px;
+      animation: twinkle 6s infinite alternate;
+      opacity: 0.7;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.4; }
+      to { opacity: 0.9; }
+    }
+
+    /* Perspective grid */
+    .grid-floor {
+      position: absolute;
+      bottom: 0;
+      width: 200%;
+      height: 55%;
+      left: -50%;
+      background-image: 
+        linear-gradient(to right, rgba(0,240,255,0.3) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,240,255,0.3) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transform: perspective(500px) rotateX(65deg);
+      transform-origin: bottom;
+      animation: gridMove 15s linear infinite;
+      mask-image: linear-gradient(to top, black 10%, transparent 90%);
+    }
+
+    @keyframes gridMove {
+      from { background-position: 0 0; }
+      to { background-position: 0 50px; }
+    }
+
+    /* Car silhouette + speakers (CSS art) */
+    .car-container {
+      position: absolute;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(90vw, 520px);
+      z-index: 2;
+      opacity: 0.9;
+    }
+
+    .car-body {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(to bottom, #e8e8e8, #b0b0b0);
+      border-radius: 20px 20px 8px 8px;
+      box-shadow: 
+        0 0 40px rgba(211,0,197,0.4),
+        0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    .trunk {
+      position: absolute;
+      top: -70px;
+      left: 5%;
+      width: 90%;
+      height: 80px;
+      background: #f0f0f0;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -10px 30px rgba(255,42,109,0.3);
+    }
+
+    /* Speakers */
+    .speakers {
+      position: absolute;
+      top: 10px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 10px;
+    }
+
+    .speaker {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #333, #111);
+      border: 3px solid #222;
+      position: relative;
+      box-shadow: 0 0 15px var(--neon-purple);
+      animation: speakerPulse 1.5s ease-in-out infinite alternate;
+    }
+
+    .speaker::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #444, #111);
+      border: 2px solid #333;
+    }
+
+    .speaker:nth-child(odd) { animation-delay: 0.3s; }
+    .speaker:nth-child(3n) { animation-delay: 0.6s; }
+
+    @keyframes speakerPulse {
+      from { box-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-pink); }
+      to { box-shadow: 0 0 25px var(--neon-purple), 0 0 50px var(--neon-pink), 0 0 70px var(--neon-cyan); }
+    }
+
+    /* Neon underglow */
+    .underglow {
+      position: absolute;
+      bottom: -8px;
+      left: 10%;
+      width: 80%;
+      height: 12px;
+      background: var(--neon-purple);
+      filter: blur(8px);
+      border-radius: 50%;
+      animation: underglow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes underglow {
+      from { opacity: 0.6; filter: blur(8px); }
+      to { opacity: 1; filter: blur(14px); }
+    }
+
+    /* ========== RADIO UI ========== */
+    .radio-wrapper {
+      position: relative;
+      z-index: 20;
+      width: min(94vw, 440px);
+      margin-top: 20px;
+    }
+
+    .radio-unit {
+      background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+      border-radius: 18px;
+      border: 3px solid #333;
+      box-shadow: 
+        0 0 0 2px #111,
+        0 0 30px rgba(0,240,255,0.25),
+        0 0 60px rgba(211,0,197,0.2),
+        inset 0 0 40px rgba(0,0,0,0.8);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Chrome top bar */
+    .radio-top {
+      height: 8px;
+      background: linear-gradient(to right, #666, #ddd, #666);
+      border-radius: 4px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Display */
+    .display {
+      background: #001a12;
+      border: 3px solid #003322;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      box-shadow: 
+        inset 0 0 20px rgba(0,255,150,0.15),
+        0 0 15px rgba(0,255,150,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .station-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.35rem;
+      color: #00ff9d;
+      text-shadow: 0 0 10px #00ff9d;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .now-playing {
+      font-size: 0.78rem;
+      color: #00cc7a;
+      margin-top: 4px;
+      opacity: 0.9;
+    }
+
+    .eq-bars {
+      display: flex;
+      gap: 3px;
+      height: 18px;
+      margin-top: 10px;
+      align-items: flex-end;
+    }
+
+    .eq-bar {
+      width: 5px;
+      background: #00ff9d;
+      border-radius: 2px;
+      animation: eq 0.5s ease-in-out infinite alternate;
+    }
+
+    .eq-bar:nth-child(1) { height: 40%; animation-delay: 0.0s; }
+    .eq-bar:nth-child(2) { height: 70%; animation-delay: 0.1s; }
+    .eq-bar:nth-child(3) { height: 100%; animation-delay: 0.2s; }
+    .eq-bar:nth-child(4) { height: 55%; animation-delay: 0.3s; }
+    .eq-bar:nth-child(5) { height: 85%; animation-delay: 0.15s; }
+    .eq-bar:nth-child(6) { height: 45%; animation-delay: 0.25s; }
+    .eq-bar:nth-child(7) { height: 90%; animation-delay: 0.05s; }
+    .eq-bar:nth-child(8) { height: 60%; animation-delay: 0.35s; }
+
+    @keyframes eq {
+      from { transform: scaleY(0.4); }
+      to { transform: scaleY(1); }
+    }
+
+    /* Controls */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .btn {
+      background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+      border: 2px solid #444;
+      border-radius: 10px;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 12px 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      box-shadow: 0 4px 0 #111;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #111;
+    }
+
+    .btn.power {
+      background: linear-gradient(145deg, #5a0000, #3a0000);
+      border-color: #ff2a6d;
+      color: #ff6b9d;
+      box-shadow: 0 4px 0 #1a0000, 0 0 15px rgba(255,42,109,0.4);
+    }
+
+    .btn.play {
+      background: linear-gradient(145deg, #003322, #001a12);
+      border-color: #00ff9d;
+      color: #00ff9d;
+      box-shadow: 0 4px 0 #00110c, 0 0 15px rgba(0,255,157,0.3);
+    }
+
+    .btn:hover, .btn.active {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 15px rgba(0,240,255,0.5);
+      color: var(--neon-cyan);
+    }
+
+    /* Presets */
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .preset {
+      background: linear-gradient(145deg, #222, #151515);
+      border: 2px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 10px 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 3px 0 #0a0a0a;
+    }
+
+    .preset:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #0a0a0a;
+    }
+
+    .preset.active {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      box-shadow: 0 0 12px rgba(255,42,109,0.5), 0 3px 0 #0a0a0a;
+      background: linear-gradient(145deg, #2a0020, #1a0015);
+    }
+
+    /* Volume */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 0 4px;
+    }
+
+    .vol-label {
+      font-size: 0.7rem;
+      color: #888;
+      min-width: 40px;
+    }
+
+    .vol-slider {
+      flex: 1;
+      height: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #222;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      z-index: 20;
+    }
+
+    .footer span {
+      color: var(--neon-pink);
+    }
+
+    /* Title above radio */
+    .title {
+      text-align: center;
+      margin-bottom: 12px;
+      z-index: 20;
+      position: relative;
+    }
+
+    .title h1 {
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      background: linear-gradient(90deg, #ff2a6d, #d300c5, #00f0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(255,42,109,0.4);
+      letter-spacing: 2px;
+    }
+
+    .title p {
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+      margin-top: 4px;
+      letter-spacing: 3px;
+    }
+
+    /* Glow animation on radio */
+    .radio-unit::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 20px;
+      padding: 2px;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan), var(--neon-pink));
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: borderRotate 6s linear infinite;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    @keyframes borderRotate {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg">
+    <div class="stars"></div>
+    <div class="grid-floor"></div>
+
+    <!-- Car with speakers -->
+    <div class="car-container">
+      <div class="trunk">
+        <div class="speakers">
+          <div class="speaker"></div>
+          <div class="speaker"></div>
+          <div class="speaker"></div>
+          <div class="speaker"></div>
+          <div class="speaker"></div>
+          <div class="speaker"></div>
+        </div>
+      </div>
+      <div class="car-body">
+        <div class="underglow"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="title">
+    <h1>SISTEMA BORICUA</h1>
+    <p>RADIO CALLE • 1000 WATTS</p>
+  </div>
+
+  <!-- Radio Unit -->
+  <div class="radio-wrapper">
+    <div class="radio-unit">
+      <div class="radio-top"></div>
+
+      <!-- Display -->
+      <div class="display">
+        <div class="station-name" id="stationName">SALSA GORDA FM</div>
+        <div class="now-playing" id="nowPlaying">Héctor Lavoe • El Cantante</div>
+        <div class="eq-bars" id="eq">
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+        </div>
+      </div>
+
+      <!-- Main Controls -->
+      <div class="controls">
+        <button class="btn power" onclick="togglePower()">POWER</button>
+        <button class="btn" onclick="prevStation()">◄◄</button>
+        <button class="btn play" id="playBtn" onclick="togglePlay()">▶ PLAY</button>
+        <button class="btn" onclick="nextStation()">►►</button>
+      </div>
+
+<!-- Presets -->
+      <div class="presets" id="presets">
+        <div class="preset active" data-station="0">1 • SALSA</div>
+        <div class="preset" data-station="1">2 • REGGAETON</div>
+        <div class="preset" data-station="2">3 • MERENGUE</div>
+        <div class="preset" data-station="3">4 • BALADAS</div>
+        <div class="preset" data-station="4">5 • OLD SCHOOL</div>
+        <div class="preset" data-station="5">6 • TRAP PR</div>
+      </div>
+
+      <!-- Volume -->
+      <div class="volume-row">
+        <div class="vol-label">VOL</div>
+        <input type="range" class="vol-slider" min="0" max="100" value="75" id="volume">
+        <div class="vol-label" id="volValue">75</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Hecho pa’ los <span>cacos</span> y la gente de la calle • <span>¡Wepa!</span> • San Juan Streets
+  </div>
+
+  <script>
+    const stations = [
+      { name: "SALSA GORDA FM", track: "Héctor Lavoe • El Cantante" },
+      { name: "REGGAETON 24/7", track: "Daddy Yankee • Gasolina" },
+      { name: "MERENGUE POWER", track: "Elvis Crespo • Suavemente" },
+      { name: "BALADAS DEL RECUERDO", track: "José José • El Triste" },
+      { name: "OLD SCHOOL PR", track: "Vico C • Explosión" },
+      { name: "TRAP BORICUA", track: "Bad Bunny • Tití Me Preguntó" }
+    ];
+
+    let current = 0;
+    let isPlaying = true;
+    let powerOn = true;
+
+    const stationName = document.getElementById('stationName');
+    const nowPlaying = document.getElementById('nowPlaying');
+    const playBtn = document.getElementById('playBtn');
+    const presets = document.querySelectorAll('.preset');
+    const volSlider = document.getElementById('volume');
+    const volValue = document.getElementById('volValue');
+    const eq = document.getElementById('eq');
+
+    function updateDisplay() {
+      stationName.textContent = stations[current].name;
+      nowPlaying.textContent = stations[current].track;
+      
+      presets.forEach((p, i) => {
+        p.classList.toggle('active', i === current);
+      });
+    }
+
+    function togglePlay() {
+      if (!powerOn) return;
+      isPlaying = !isPlaying;
+      playBtn.textContent = isPlaying ? "⏸ PAUSE" : "▶ PLAY";
+      eq.style.opacity = isPlaying ? "1" : "0.3";
+    }
+
+    function togglePower() {
+      powerOn = !powerOn;
+      const display = document.querySelector('.display');
+      if (powerOn) {
+        display.style.opacity = "1";
+        updateDisplay();
+        isPlaying = true;
+        playBtn.textContent = "⏸ PAUSE";
+      } else {
+        display.style.opacity = "0.3";
+        stationName.textContent = "SISTEMA APAGADO";
+        nowPlaying.textContent = "— — —";
+        playBtn.textContent = "▶ PLAY";
+        isPlaying = false;
+      }
+    }
+
+    function nextStation() {
+      if (!powerOn) return;
+      current = (current + 1) % stations.length;
+      updateDisplay();
+    }
+
+    function prevStation() {
+      if (!powerOn) return;
+      current = (current - 1 + stations.length) % stations.length;
+      updateDisplay();
+    }
+
+    presets.forEach(p => {
+      p.addEventListener('click', () => {
+        if (!powerOn) return;
+        current = parseInt(p.dataset.station);
+        updateDisplay();
+      });
+    });
+
+    volSlider.addEventListener('input', () => {
+      volValue.textContent = volSlider.value;
+    });
+
+    // Init
+    updateDisplay();
+  </script>
+</body>
+</html>
