@@ -2,505 +2,358 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>BORICUA_RADIO.exe // Y2K SYSTEM</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
-
-  :root {
-    --neon: #00ff41;
-    --neon-dim: #00cc33;
-    --dark: #020f05;
-    --panel: #001a0a;
-    --error: #ff003c;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  body {
-    background: 
-      radial-gradient(ellipse at center, #043016 0%, #021a0c 40%, #010d07 100%);
-    color: var(--neon);
-    font-family: 'Share Tech Mono', 'VT323', monospace;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    position: relative;
-  }
-
-  /* ========== GLITCHED BACKGROUND EFFECTS ========== */
-
-  /* Stronger scanlines */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 255, 65, 0.04) 0px,
-      rgba(0, 255, 65, 0.04) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-    pointer-events: none;
-    z-index: 1000;
-    animation: scanlineMove 8s linear infinite;
-  }
-
-  @keyframes scanlineMove {
-    from { background-position: 0 0; }
-    to { background-position: 0 100px; }
-  }
-
-  /* Noise / static overlay */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 999;
-    opacity: 0.5;
-    animation: noise 0.3s steps(3) infinite;
-  }
-
-  @keyframes noise {
-    0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(-1%, 1%); }
-    50% { transform: translate(1%, -1%); }
-    75% { transform: translate(-1%, -1%); }
-  }
-
-  /* Extra glitch layer */
-  .glitch-bg {
-    position: fixed;
-    inset: 0;
-    background: 
-      linear-gradient(90deg, transparent 0%, rgba(0,255,65,0.03) 50%, transparent 100%);
-    pointer-events: none;
-    z-index: 998;
-    animation: glitchSlide 6s linear infinite;
-    mix-blend-mode: screen;
-  }
-
-  @keyframes glitchSlide {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  /* Floating decorations */
-  .deco {
-    position: fixed;
-    font-size: 1.8rem;
-    opacity: 0.18;
-    pointer-events: none;
-    z-index: 0;
-    animation: float 7s ease-in-out infinite;
-    filter: drop-shadow(0 0 6px var(--neon));
-  }
-  .deco:nth-child(1) { top: 8%; left: 5%; animation-delay: 0s; }
-  .deco:nth-child(2) { top: 15%; right: 8%; animation-delay: 1.2s; }
-  .deco:nth-child(3) { bottom: 20%; left: 10%; animation-delay: 2.4s; }
-  .deco:nth-child(4) { bottom: 12%; right: 6%; animation-delay: 3s; }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-18px) rotate(6deg); }
-  }
-
-  /* Main Window */
-  .window {
-  width: min(92vw, 380px);   /* antes era 460px */
-  background: var(--panel);
-  border: 2px solid var(--neon);
-  box-shadow: 
-    0 0 15px var(--neon),
-    0 0 40px rgba(0, 255, 65, 0.25),
-    inset 0 0 30px rgba(0, 255, 65, 0.05);
-  position: relative;
-  z-index: 10;
-  overflow: hidden;
-}
-
-  /* Title bar */
-  .title-bar {
-    background: var(--neon);
-    color: #000;
-    padding: 6px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.1rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-
-  .title-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .window-btns {
-    display: flex;
-    gap: 6px;
-  }
-
-  .win-btn {
-    width: 18px;
-    height: 18px;
-    background: #000;
-    color: var(--neon);
-    border: 1px solid var(--neon);
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    line-height: 1;
-  }
-
-  .win-btn:hover {
-    background: var(--neon);
-    color: #000;
-  }
-
-  /* Content */
-  .content {
-    padding: 14px;
-  }
-
-  /* Status / Now Playing */
-  .status-bar {
-    border: 1px solid var(--neon);
-    padding: 10px;
-    margin-bottom: 14px;
-    background: rgba(0, 0, 0, 0.6);
-    position: relative;
-  }
-
-  .status-label {
-    font-size: 0.75rem;
-    color: var(--neon-dim);
-    margin-bottom: 4px;
-    letter-spacing: 2px;
-  }
-
-  .station-name {
-    font-size: 1.5rem;
-    text-shadow: 0 0 10px var(--neon);
-    margin-bottom: 2px;
-    animation: glitch 3.5s infinite;
-  }
-
-  .track-name {
-    font-size: 1rem;
-    color: var(--neon-dim);
-  }
-
-  /* Visualizer Canvas */
-  #visualizer {
-    width: 100%;
-    height: 110px;
-    background: #000;
-    border: 1px solid var(--neon);
-    margin: 12px 0;
-    display: block;
-  }
-
-  /* Controls */
-  .controls {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .btn {
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid var(--neon);
-    color: var(--neon);
-    font-family: inherit;
-    font-size: 0.95rem;
-    padding: 12px 4px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn:hover, .btn.active {
-    background: var(--neon);
-    color: #000;
-    box-shadow: 0 0 18px var(--neon);
-  }
-
-  .btn:active {
-    transform: scale(0.96);
-  }
-
-  .btn.play {
-    grid-column: span 2;
-    font-size: 1.1rem;
-  }
-
-  .btn.power {
-    border-color: var(--error);
-    color: var(--error);
-  }
-
-  .btn.power:hover, .btn.power.active {
-    background: var(--error);
-    color: #000;
-    box-shadow: 0 0 15px var(--error);
-  }
-
-  /* Presets */
-  .section-title {
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    margin: 12px 0 8px;
-    color: var(--neon-dim);
-    text-align: center;
-  }
-
-  .presets {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .preset {
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid var(--neon-dim);
-    color: var(--neon);
-    font-family: inherit;
-    font-size: 0.9rem;
-    padding: 10px 6px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-  }
-
-  .preset:hover, .preset.active {
-    border-color: var(--neon);
-    background: rgba(0, 255, 65, 0.15);
-    box-shadow: 0 0 12px rgba(0, 255, 65, 0.4);
-  }
-
-  /* Volume */
-  .volume-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    border: 1px solid var(--neon-dim);
-    padding: 10px 12px;
-    background: rgba(0, 0, 0, 0.4);
-  }
-
-  .vol-label {
-    font-size: 0.85rem;
-    min-width: 36px;
-  }
-
-  input[type="range"] {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    background: #003311;
-    border: 1px solid var(--neon);
-    outline: none;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    background: var(--neon);
-    cursor: pointer;
-    box-shadow: 0 0 8px var(--neon);
-  }
-
-  /* Link placeholders */
-  .links-box {
-    margin-top: 14px;
-    border: 1px dashed var(--neon-dim);
-    padding: 10px;
-    font-size: 0.8rem;
-    color: var(--neon-dim);
-    background: rgba(0, 0, 0, 0.3);
-  }
-
-  .links-box div {
-    margin: 4px 0;
-    word-break: break-all;
-  }
-
-  .links-box span {
-    color: var(--neon);
-  }
-
-  /* Footer */
-  .footer {
-    margin-top: 16px;
-    text-align: center;
-    font-size: 0.85rem;
-    color: var(--neon-dim);
-    z-index: 10;
-  }
-
-  .footer span {
-    color: var(--neon);
-  }
-
-  /* Blinking cursor */
-  .cursor {
-    display: inline-block;
-    width: 8px;
-    height: 1em;
-    background: var(--neon);
-    animation: blink 1s step-end infinite;
-    vertical-align: middle;
-    margin-left: 4px;
-  }
-
-  /* ========== MOBILE OPTIMIZATION ========== */
-@media (max-width: 480px) {
-  body {
-    padding: 8px;
-    justify-content: flex-start;
-    padding-top: 12px;
-  }
-
-  .window {
-    width: 94vw;
-    max-width: 360px;
-  }
-
-  .content {
-    padding: 10px;
-  }
-
-  .status-bar {
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-
-  .station-name {
-    font-size: 1.25rem;
-  }
-
-  .track-name {
-    font-size: 0.9rem;
-  }
-
-  #visualizer {
-    height: 80px;          /* más pequeño */
-    margin: 8px 0;
-  }
-
-  .controls {
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-
-  .btn {
-    padding: 9px 4px;
-    font-size: 0.85rem;
-  }
-
-  .btn.play {
-    font-size: 0.95rem;
-  }
-
-  .section-title {
-    margin: 8px 0 6px;
-    font-size: 0.75rem;
-  }
-
-  .presets {
-    gap: 6px;
-  }
-
-  .preset {
-    padding: 8px 4px;
-    font-size: 0.82rem;
-  }
-
-  .volume-row {
-    margin-top: 10px;
-    padding: 8px 10px;
-  }
-
-  .links-box {
-    margin-top: 10px;
-    padding: 8px;
-    font-size: 0.72rem;
-  }
-
-  .footer {
-    margin-top: 10px;
-    font-size: 0.75rem;
-  }
-
-  .deco {
-    font-size: 1.3rem;
-    opacity: 0.12;
-  }
-}
-
-/* Extra small phones */
-@media (max-width: 360px) {
-  .window {
-    max-width: 340px;
-  }
-  
-  .station-name {
-    font-size: 1.15rem;
-  }
-  
-  #visualizer {
-    height: 70px;
-  }
-}
-
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
-
-  /* Glitch text */
-  @keyframes glitch {
-    0% { text-shadow: 0 0 10px var(--neon); }
-    20% { text-shadow: -2px 0 #ff003c, 2px 0 #00ffff; }
-    40% { text-shadow: 0 0 10px var(--neon); }
-    60% { text-shadow: 2px 0 #ff003c, -2px 0 #00ffff; }
-    100% { text-shadow: 0 0 10px var(--neon); }
-  }
-</style>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --neon: #00ff41;
+      --neon-dim: #00cc33;
+      --dark: #020f05;
+      --panel: #001a0a;
+      --error: #ff003c;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background: #020f05;
+      height: 100%;
+    }
+
+    body {
+      background: radial-gradient(ellipse at center, #043016 0%, #021a0c 40%, #010d07 100%);
+      color: var(--neon);
+      font-family: 'Share Tech Mono', 'VT323', monospace;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 10px 30px;
+      padding-top: calc(20px + env(safe-area-inset-top));
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      position: relative;
+    }
+
+    /* Scanlines */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 65, 0.035) 0px,
+        rgba(0, 255, 65, 0.035) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* Noise */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.45;
+    }
+
+    .glitch-bg {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,255,65,0.025) 50%, transparent 100%);
+      pointer-events: none;
+      z-index: 998;
+      animation: glitchSlide 7s linear infinite;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes glitchSlide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .deco {
+      position: fixed;
+      font-size: 1.4rem;
+      opacity: 0.13;
+      pointer-events: none;
+      z-index: 0;
+      animation: float 7s ease-in-out infinite;
+      filter: drop-shadow(0 0 6px var(--neon));
+    }
+    .deco:nth-child(1) { top: 12%; left: 4%; }
+    .deco:nth-child(2) { top: 18%; right: 5%; animation-delay: 1.2s; }
+    .deco:nth-child(3) { bottom: 18%; left: 6%; animation-delay: 2.1s; }
+    .deco:nth-child(4) { bottom: 14%; right: 5%; animation-delay: 3s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* Main Window - smaller */
+    .window {
+      width: min(92vw, 340px);
+      background: var(--panel);
+      border: 2px solid var(--neon);
+      box-shadow: 
+        0 0 12px var(--neon),
+        0 0 30px rgba(0, 255, 65, 0.22),
+        inset 0 0 20px rgba(0, 255, 65, 0.04);
+      position: relative;
+      z-index: 10;
+      margin-top: 30px;
+    }
+
+    .title-bar {
+      background: var(--neon);
+      color: #000;
+      padding: 5px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .window-btns {
+      display: flex;
+      gap: 5px;
+    }
+
+    .win-btn {
+      width: 16px;
+      height: 16px;
+      background: #000;
+      color: var(--neon);
+      border: 1px solid var(--neon);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .content {
+      padding: 10px;
+    }
+
+    .status-bar {
+      border: 1px solid var(--neon);
+      padding: 8px;
+      margin-bottom: 10px;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .status-label {
+      font-size: 0.68rem;
+      color: var(--neon-dim);
+      margin-bottom: 3px;
+      letter-spacing: 1px;
+    }
+
+    .station-name {
+      font-size: 1.2rem;
+      text-shadow: 0 0 8px var(--neon);
+      margin-bottom: 2px;
+      animation: glitch 3.8s infinite;
+    }
+
+    .track-name {
+      font-size: 0.85rem;
+      color: var(--neon-dim);
+    }
+
+    #visualizer {
+      width: 100%;
+      height: 72px;
+      background: #000;
+      border: 1px solid var(--neon);
+      margin: 8px 0;
+      display: block;
+    }
+
+    /* Controls - fixed layout */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      font-family: inherit;
+      font-size: 0.78rem;
+      padding: 8px 0;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .btn:hover, .btn.active {
+      background: var(--neon);
+      color: #000;
+      box-shadow: 0 0 12px var(--neon);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn.play {
+      flex: 1.4;
+      font-size: 0.85rem;
+    }
+
+    .btn.power {
+      border-color: var(--error);
+      color: var(--error);
+      flex: 0.9;
+    }
+
+    .btn.power:hover, .btn.power.active {
+      background: var(--error);
+      color: #000;
+      box-shadow: 0 0 12px var(--error);
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      margin: 8px 0 6px;
+      color: var(--neon-dim);
+      text-align: center;
+    }
+
+    .presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .preset {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--neon-dim);
+      color: var(--neon);
+      font-family: inherit;
+      font-size: 0.78rem;
+      padding: 7px 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .preset:hover, .preset.active {
+      border-color: var(--neon);
+      background: rgba(0, 255, 65, 0.15);
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.35);
+    }
+
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      border: 1px solid var(--neon-dim);
+      padding: 7px 10px;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .vol-label {
+      font-size: 0.75rem;
+      min-width: 30px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      background: #003311;
+      border: 1px solid var(--neon);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--neon);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--neon);
+    }
+
+    .footer {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--neon-dim);
+      z-index: 10;
+    }
+
+    .footer span {
+      color: var(--neon);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 7px;
+      height: 0.95em;
+      background: var(--neon);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 3px;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 0 0 8px var(--neon); }
+      25% { text-shadow: -1px 0 #ff003c, 1px 0 #00ffff; }
+      50% { text-shadow: 0 0 8px var(--neon); }
+      75% { text-shadow: 1px 0 #ff003c, -1px 0 #00ffff; }
+      100% { text-shadow: 0 0 8px var(--neon); }
+    }
+  </style>
 </head>
 <body>
-  <!-- Decorative elements -->
   <div class="glitch-bg"></div>
+
   <div class="deco">🕷️</div>
   <div class="deco">💀</div>
   <div class="deco">🌐</div>
   <div class="deco">⚡</div>
 
-  <!-- Main Window -->
   <div class="window">
     <div class="title-bar">
       <div class="title-left">
@@ -515,25 +368,21 @@
     </div>
 
     <div class="content">
-      <!-- Status -->
       <div class="status-bar">
         <div class="status-label">// AHORA TRANSMITIENDO DESDE SAN JUAN</div>
         <div class="station-name" id="stationName">SALSA_GORDA_FM</div>
         <div class="track-name" id="trackName">Héctor Lavoe • El Cantante <span class="cursor"></span></div>
       </div>
 
-      <!-- Visualizer -->
       <canvas id="visualizer"></canvas>
 
-      <!-- Controls -->
       <div class="controls">
-        <button class="btn power" id="powerBtn" onclick="togglePower()">POWER</button>
+        <button class="btn power" id="powerBtn" onclick="togglePower()">PWR</button>
         <button class="btn" onclick="prevStation()">◀◀</button>
         <button class="btn play" id="playBtn" onclick="togglePlay()">▶ PLAY</button>
         <button class="btn" onclick="nextStation()">▶▶</button>
       </div>
 
-      <!-- Presets -->
       <div class="section-title">[ ESTACIONES BORICUAS ]</div>
       <div class="presets" id="presets">
         <button class="preset active" data-station="0">01 SALSA</button>
@@ -544,73 +393,57 @@
         <button class="preset" data-station="5">06 TRAP PR</button>
       </div>
 
-      <!-- Volume -->
       <div class="volume-row">
         <div class="vol-label">VOL</div>
         <input type="range" id="volume" min="0" max="100" value="75">
         <div class="vol-label" id="volValue">75</div>
       </div>
-
-      <!-- Stream links placeholders -->
-      <div class="links-box">
-        <div>// STREAM LINKS (pega tus urls aquí)</div>
-        <div>01 → <span>insert link aqui</span></div>
-        <div>02 → <span>insert link aqui</span></div>
-        <div>03 → <span>insert link aqui</span></div>
-        <div>04 → <span>insert link aqui</span></div>
-        <div>05 → <span>insert link aqui</span></div>
-        <div>06 → <span>insert link aqui</span></div>
-      </div>
     </div>
   </div>
 
   <div class="footer">
-    SYSTEM READY • <span>WEPA_2000</span> • SAN JUAN STREETS • <span>NO SIGNAL LOST</span>
+    SYSTEM READY • <span>WEPA_2000</span> • SAN JUAN STREETS
   </div>
 
-  <!-- Hidden audio element -->
-  <audio id="audio" crossorigin="anonymous"></audio>
+  <audio id="audio" preload="auto"></audio>
 
   <script>
-    // ============ STATIONS ============
     const stations = [
       { 
         name: "SALSA_GORDA_FM", 
         track: "Héctor Lavoe • El Cantante",
-        url: "https://radio.plaza.one/mp3"   // ← pega tu stream aquí
+        url: "https://radio.plaza.one/mp3"
       },
       { 
         name: "REGGAETON_24/7", 
         track: "Daddy Yankee • Gasolina",
-        url: "insert link aqui"
+        url: "https://radio.plaza.one/mp3"
       },
       { 
         name: "MERENGUE_POWER", 
         track: "Elvis Crespo • Suavemente",
-        url: "insert link aqui"
+        url: "https://radio.plaza.one/mp3"
       },
       { 
         name: "BALADAS_PR", 
         track: "José José • El Triste",
-        url: "insert link aqui"
+        url: "https://radio.plaza.one/mp3"
       },
       { 
         name: "OLD_SCHOOL_PR", 
         track: "Vico C • Explosión",
-        url: "insert link aqui"
+        url: "https://radio.plaza.one/mp3"
       },
       { 
         name: "TRAP_BORICUA", 
         track: "Bad Bunny • Tití Me Preguntó",
-        url: "insert link aqui"
+        url: "https://radio.plaza.one/mp3"
       }
     ];
 
     let current = 0;
     let isPlaying = false;
     let powerOn = true;
-    let audioCtx, analyser, dataArray, source;
-    let animationId;
 
     const audio = document.getElementById('audio');
     const canvas = document.getElementById('visualizer');
@@ -623,25 +456,26 @@
     const volValue = document.getElementById('volValue');
     const presets = document.querySelectorAll('.preset');
 
-    // Resize canvas
     function resizeCanvas() {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // ============ VISUALIZER ============
+    // Visualizer shapes
     const shapes = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 16; i++) {
       shapes.push({
         x: Math.random(),
         y: Math.random(),
-        size: 4 + Math.random() * 20,
-        speedX: (Math.random() - 0.5) * 0.4,
-        speedY: (Math.random() - 0.5) * 0.4,
-        type: Math.floor(Math.random() * 4), // 0:circle 1:square 2:triangle 3:line
+        size: 3 + Math.random() * 16,
+        speedX: (Math.random() - 0.5) * 0.35,
+        speedY: (Math.random() - 0.5) * 0.35,
+        type: Math.floor(Math.random() * 4),
         pulse: Math.random() * Math.PI * 2
       });
     }
@@ -652,28 +486,21 @@
       ctx.clearRect(0, 0, w, h);
 
       // Grid
-      ctx.strokeStyle = `rgba(0, 255, 65, ${0.08 + intensity * 0.1})`;
+      ctx.strokeStyle = `rgba(0, 255, 65, ${0.07 + intensity * 0.08})`;
       ctx.lineWidth = 1;
-      for (let i = 0; i < w; i += 20) {
+      for (let i = 0; i < w; i += 18) {
         ctx.beginPath();
         ctx.moveTo(i, 0);
         ctx.lineTo(i, h);
         ctx.stroke();
       }
-      for (let i = 0; i < h; i += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(w, i);
-        ctx.stroke();
-      }
 
-      // Abstract shapes
       shapes.forEach(s => {
-        s.pulse += 0.08 + intensity * 0.15;
-        const pulseSize = s.size * (0.7 + Math.sin(s.pulse) * 0.5 * intensity + intensity * 0.6);
+        s.pulse += 0.07 + intensity * 0.12;
+        const pulseSize = s.size * (0.65 + Math.sin(s.pulse) * 0.45 * intensity + intensity * 0.5);
         
-        s.x += s.speedX * (0.5 + intensity);
-        s.y += s.speedY * (0.5 + intensity);
+        s.x += s.speedX * (0.4 + intensity);
+        s.y += s.speedY * (0.4 + intensity);
         
         if (s.x < 0 || s.x > 1) s.speedX *= -1;
         if (s.y < 0 || s.y > 1) s.speedY *= -1;
@@ -681,87 +508,87 @@
         const x = s.x * w;
         const y = s.y * h;
 
-        ctx.strokeStyle = `rgba(0, 255, 65, ${0.4 + intensity * 0.6})`;
-        ctx.fillStyle = `rgba(0, 255, 65, ${0.05 + intensity * 0.15})`;
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = `rgba(0, 255, 65, ${0.35 + intensity * 0.55})`;
+        ctx.lineWidth = 1.3;
 
         ctx.beginPath();
-        if (s.type === 0) { // circle
+        if (s.type === 0) {
           ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
-        } else if (s.type === 1) { // square
+        } else if (s.type === 1) {
           ctx.rect(x - pulseSize, y - pulseSize, pulseSize * 2, pulseSize * 2);
-        } else if (s.type === 2) { // triangle
+        } else if (s.type === 2) {
           ctx.moveTo(x, y - pulseSize);
           ctx.lineTo(x + pulseSize, y + pulseSize);
           ctx.lineTo(x - pulseSize, y + pulseSize);
           ctx.closePath();
-        } else { // cross
+        } else {
           ctx.moveTo(x - pulseSize, y);
           ctx.lineTo(x + pulseSize, y);
           ctx.moveTo(x, y - pulseSize);
           ctx.lineTo(x, y + pulseSize);
         }
         ctx.stroke();
-        if (s.type < 3) ctx.fill();
       });
 
-// Center wireframe circle
+      // Center circle
       const cx = w / 2;
       const cy = h / 2;
-      const radius = 20 + intensity * 35;
+      const radius = 16 + intensity * 28;
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(0, 255, 65, ${0.3 + intensity * 0.5})`;
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(0, 255, 65, ${0.25 + intensity * 0.45})`;
+      ctx.lineWidth = 1.8;
       ctx.stroke();
 
-      // Rotating lines
       const time = Date.now() / 1000;
-      for (let i = 0; i < 6; i++) {
-        const angle = time * (1 + intensity) + (i * Math.PI / 3);
+      for (let i = 0; i < 5; i++) {
+        const angle = time * (1 + intensity) + (i * Math.PI / 2.5);
         ctx.beginPath();
         ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(angle) * radius * 1.4, cy + Math.sin(angle) * radius * 1.4);
-        ctx.strokeStyle = `rgba(0, 255, 65, ${0.2 + intensity * 0.4})`;
+        ctx.lineTo(cx + Math.cos(angle) * radius * 1.35, cy + Math.sin(angle) * radius * 1.35);
+        ctx.strokeStyle = `rgba(0, 255, 65, ${0.18 + intensity * 0.35})`;
         ctx.stroke();
       }
     }
 
     function animate() {
-      let intensity = 0.25;
+      let intensity = 0.22;
       if (isPlaying && powerOn) {
-        intensity = 0.6 + Math.sin(Date.now() / 200) * 0.25 + Math.random() * 0.2;
+        intensity = 0.55 + Math.sin(Date.now() / 180) * 0.22 + Math.random() * 0.18;
       }
       drawVisualizer(intensity);
-      animationId = requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     }
     animate();
 
-    // ============ PLAYER FUNCTIONS ============
     function updateUI() {
       stationNameEl.textContent = stations[current].name;
       trackNameEl.innerHTML = stations[current].track + ' <span class="cursor"></span>';
       presets.forEach((p, i) => p.classList.toggle('active', i === current));
       
-      // Load stream if real link exists
-      if (stations[current].url && !stations[current].url.includes('https://radio.plaza.one/mp3')) {
+      if (stations[current].url) {
         audio.src = stations[current].url;
-        if (isPlaying) audio.play().catch(()=>{});
+        audio.load();
       }
     }
 
     function togglePlay() {
       if (!powerOn) return;
-      isPlaying = !isPlaying;
-      playBtn.textContent = isPlaying ? "⏸ PAUSE" : "▶ PLAY";
-      playBtn.classList.toggle('active', isPlaying);
-
-      if (isPlaying) {
-        if (stations[current].url && !stations[current].url.includes('insert link')) {
-          audio.play().catch(e => console.log('Stream error:', e));
-        }
+      
+      if (!isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          playBtn.textContent = "⏸ PAUSE";
+          playBtn.classList.add('active');
+        }).catch(err => {
+          console.log("Play error:", err);
+          alert("No se pudo reproducir el stream. Prueba otro enlace o revisa la conexión.");
+        });
       } else {
         audio.pause();
+        isPlaying = false;
+        playBtn.textContent = "▶ PLAY";
+        playBtn.classList.remove('active');
       }
     }
 
@@ -771,14 +598,11 @@
       
       if (powerOn) {
         updateUI();
-        if (isPlaying) {
-          playBtn.textContent = "⏸ PAUSE";
-          audio.play().catch(()=>{});
-        }
       } else {
         stationNameEl.textContent = "SYSTEM_OFFLINE";
         trackNameEl.innerHTML = "NO SIGNAL <span class='cursor'></span>";
         playBtn.textContent = "▶ PLAY";
+        playBtn.classList.remove('active');
         isPlaying = false;
         audio.pause();
       }
@@ -788,27 +612,31 @@
       if (!powerOn) return;
       current = (current + 1) % stations.length;
       updateUI();
-      if (isPlaying) audio.play().catch(()=>{});
+      if (isPlaying) {
+        audio.play().catch(() => {});
+      }
     }
 
     function prevStation() {
       if (!powerOn) return;
       current = (current - 1 + stations.length) % stations.length;
       updateUI();
-      if (isPlaying) audio.play().catch(()=>{});
+      if (isPlaying) {
+        audio.play().catch(() => {});
+      }
     }
 
-    // Preset clicks
     presets.forEach(p => {
       p.addEventListener('click', () => {
         if (!powerOn) return;
         current = parseInt(p.dataset.station);
         updateUI();
-        if (isPlaying) audio.play().catch(()=>{});
+        if (isPlaying) {
+          audio.play().catch(() => {});
+        }
       });
     });
 
-    // Volume
     volSlider.addEventListener('input', () => {
       const val = volSlider.value;
       volValue.textContent = val;
@@ -816,7 +644,11 @@
     });
     audio.volume = 0.75;
 
-    // Init
+    // Mejor manejo de errores de audio
+    audio.addEventListener('error', () => {
+      console.log("Error cargando el stream");
+    });
+
     updateUI();
   </script>
 </body>
